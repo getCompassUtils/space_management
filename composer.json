@@ -1,0 +1,20 @@
+{
+	"name": "backend_compass_dev_2/compass_space",
+	"type": "library",
+	"description": "пакет для работы с пространствами",
+	"autoload": {
+		"files": ["src/Tariff/Loader.php"],
+		"psr-4": {
+			"Tariff\\": "src/Tariff"
+		}
+	},
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "https://github.com/getCompassUtils/space_management"
+		}
+	],
+	"require": {
+
+	}
+}
