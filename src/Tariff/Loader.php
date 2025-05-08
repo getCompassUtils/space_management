@@ -14,15 +14,25 @@ abstract class Loader {
 	public const MEMBER_COUNT_PLAN_KEY = "member_count";
 	public const MEMBER_COUNT_PLAN_ID  = 1000;
 
+	// у плана есть два типа ключей — буквенный и числовой
+	public const PREMISE_USER_COUNT_PLAN_KEY = "premise_user_count";
+	public const PREMISE_USER_COUNT_PLAN_ID  = 2000;
+
 	/** @var Plan\MemberCount\MemberCount[] список планов числа участников */
 	protected const _KNOWN_MEMBER_COUNT_PLAN_LIST = [
 		\Tariff\Plan\MemberCount\Default\Plan::PLAN_ID => \Tariff\Plan\MemberCount\Default\Plan::class
 	];
 
+	/** @var Plan\PremiseUserCount\PremiseUserCount[] список планов числа участников */
+	protected const _KNOWN_PREMISE_USER_COUNT_PLAN_LIST = [
+		\Tariff\Plan\PremiseUserCount\Default\Plan::PLAN_ID => \Tariff\Plan\PremiseUserCount\Default\Plan::class
+	];
+
 	// список связи ключ плана — идентификатор плана
 	// чтобы не делать два отдельных списка для планов
 	protected const _PLAN_ID_KEY_DICTIONARY = [
-		self::MEMBER_COUNT_PLAN_ID => self::MEMBER_COUNT_PLAN_KEY,
+		self::MEMBER_COUNT_PLAN_ID       => self::MEMBER_COUNT_PLAN_KEY,
+		self::PREMISE_USER_COUNT_PLAN_ID => self::PREMISE_USER_COUNT_PLAN_KEY,
 	];
 
 	// данные для планов по умолчанию
@@ -34,7 +44,8 @@ abstract class Loader {
 	protected array $_stored_last_rows = []; // сгруппированные данные для загрузки из строк
 	protected array $_stored_data      = []; // сгруппированные данные для загрузки из конфигов
 
-	protected ?Plan\MemberCount\MemberCount $_member_count_plan = null;
+	protected ?Plan\MemberCount\MemberCount           $_member_count_plan       = null;
+	protected ?Plan\PremiseUserCount\PremiseUserCount $_premise_user_count_plan = null;
 
 	/**
 	 * Закрываем конструктор.
@@ -73,6 +84,37 @@ abstract class Loader {
 		}
 
 		return $this->_member_count_plan;
+	}
+
+	/**
+	 * Возвращает загруженный тарифный план для пользователей on premise.
+	 */
+	public function premiseUserCount():Plan\PremiseUserCount\PremiseUserCount {
+
+		$key = static::PREMISE_USER_COUNT_PLAN_KEY;
+
+		if (is_null($this->_premise_user_count_plan)) {
+
+			if (isset($this->_stored_rows[$key])) {
+
+				// пытаемся загрузить из строк
+				$this->_premise_user_count_plan = static::_loadPremiseUserCountFromRows($this->_stored_rows[$key], $this->_stored_last_rows[$key]);
+			} elseif (isset($this->_stored_data[$key])) {
+
+				// затем пытаемся загрузить из конкретных данные
+				$this->_premise_user_count_plan = static::_loadPremiseUserFromData($this->_stored_data[$key]);
+			} elseif (isset(static::_DEFAULT_DATA[$key])) {
+
+				// пробуем данные по умолчанию
+				$this->_premise_user_count_plan = static::_loadPremiseUserFromData(static::_DEFAULT_DATA[$key]);
+			} else {
+
+				// если данные не были загружено, то что поделать
+				throw new \RuntimeException("member count plan data wasn't load");
+			}
+		}
+
+		return $this->_premise_user_count_plan;
 	}
 
 	/**
@@ -149,6 +191,45 @@ abstract class Loader {
 
 		/** @var Plan\MemberCount\MemberCount $plan_class */
 		$plan_class = static::_KNOWN_MEMBER_COUNT_PLAN_LIST[$plan_id];
+		return $plan_class::fromData($active_till, $free_active_till, $option_list);
+	}
+
+	/**
+	 * Загружает соответствующий тарифный план ограничения числа участников.
+	 */
+	protected static function _loadPremiseUserCountFromRows(array $row_list, array $last_row):Plan\PremiseUserCount\PremiseUserCount {
+
+		// без записей создаем план по умолчанию
+		if (count($row_list) === 0) {
+			throw new \RuntimeException("passed empty row list");
+		}
+
+		// из последней записи понимаем, какая это вариация плана
+		$plan_id = (int) $last_row["plan_id"];
+
+		// проверяем, что такой план известен
+		if (!array_key_exists($plan_id, static::_KNOWN_PREMISE_USER_COUNT_PLAN_LIST)) {
+			throw new \RuntimeException("resolved unknown plan $plan_id");
+		}
+
+		/** @var Plan\PremiseUserCount\PremiseUserCount $plan_class */
+		$plan_class = static::_KNOWN_PREMISE_USER_COUNT_PLAN_LIST[$plan_id];
+		return $plan_class::fromRows($row_list);
+	}
+
+	/**
+	 * Загружает соответствующий тарифный план ограничения числа участников.
+	 */
+	protected static function _loadPremiseUserFromData(array $data):Plan\PremiseUserCount\PremiseUserCount {
+
+		extract($data);
+
+		if (!array_key_exists($plan_id, static::_KNOWN_PREMISE_USER_COUNT_PLAN_LIST)) {
+			throw new \RuntimeException("resolved unknown plan $plan_id");
+		}
+
+		/** @var Plan\PremiseUserCount\PremiseUserCount $plan_class */
+		$plan_class = static::_KNOWN_PREMISE_USER_COUNT_PLAN_LIST[$plan_id];
 		return $plan_class::fromData($active_till, $free_active_till, $option_list);
 	}
 }
