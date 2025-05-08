@@ -120,6 +120,36 @@ class OptionLimit extends Option {
 	public const LIMIT_980  = 980;
 	public const LIMIT_990  = 990;
 	public const LIMIT_1000 = 1000;
+	public const LIMIT_1050 = 1050;
+	public const LIMIT_1100 = 1100;
+	public const LIMIT_1150 = 1150;
+	public const LIMIT_1200 = 1200;
+	public const LIMIT_1250 = 1250;
+	public const LIMIT_1300 = 1300;
+	public const LIMIT_1350 = 1350;
+	public const LIMIT_1400 = 1400;
+	public const LIMIT_1450 = 1450;
+	public const LIMIT_1500 = 1500;
+	public const LIMIT_1550 = 1550;
+	public const LIMIT_1600 = 1600;
+	public const LIMIT_1650 = 1650;
+	public const LIMIT_1700 = 1700;
+	public const LIMIT_1750 = 1750;
+	public const LIMIT_1800 = 1800;
+	public const LIMIT_1850 = 1850;
+	public const LIMIT_1900 = 1900;
+	public const LIMIT_1950 = 1950;
+	public const LIMIT_2000 = 2000;
+	public const LIMIT_2100 = 2100;
+	public const LIMIT_2200 = 2200;
+	public const LIMIT_2300 = 2300;
+	public const LIMIT_2400 = 2400;
+	public const LIMIT_2500 = 2500;
+	public const LIMIT_2600 = 2600;
+	public const LIMIT_2700 = 2700;
+	public const LIMIT_2800 = 2800;
+	public const LIMIT_2900 = 2900;
+	public const LIMIT_3000 = 3000;
 
 	/** @var array список значений, доступных бесплатно */
 	protected const _FREE_LIMIT_LIST = [self::LIMIT_10];
@@ -240,6 +270,36 @@ class OptionLimit extends Option {
 		self::LIMIT_980,
 		self::LIMIT_990,
 		self::LIMIT_1000,
+		self::LIMIT_1050,
+		self::LIMIT_1100,
+		self::LIMIT_1150,
+		self::LIMIT_1200,
+		self::LIMIT_1250,
+		self::LIMIT_1300,
+		self::LIMIT_1350,
+		self::LIMIT_1400,
+		self::LIMIT_1450,
+		self::LIMIT_1500,
+		self::LIMIT_1550,
+		self::LIMIT_1600,
+		self::LIMIT_1650,
+		self::LIMIT_1700,
+		self::LIMIT_1750,
+		self::LIMIT_1800,
+		self::LIMIT_1850,
+		self::LIMIT_1900,
+		self::LIMIT_1950,
+		self::LIMIT_2000,
+		self::LIMIT_2100,
+		self::LIMIT_2200,
+		self::LIMIT_2300,
+		self::LIMIT_2400,
+		self::LIMIT_2500,
+		self::LIMIT_2600,
+		self::LIMIT_2700,
+		self::LIMIT_2800,
+		self::LIMIT_2900,
+		self::LIMIT_3000,
 	];
 
 	/** @var int текущее значение числа участников */
