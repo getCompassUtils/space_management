@@ -330,8 +330,9 @@ class OptionLimit extends Option {
 			return new \Tariff\Plan\AlterationAvailability(\Tariff\Plan\AlterationAvailability::UNAVAILABLE_UNAPPROPRIATED, static::ERROR_CHANGE_WITHOUT_CHANGE_ACTION, "change action required");
 		}
 
-		// новая опция не удовлетворяет указанным параметрам окружения
-		if (!$expected_result->option_limit->isFit($circumstance)) {
+		// если достигнут лимит пользователей, запрещаем изменение для всех случаем
+		// кроме попытки продлить лицензию без активации (т.е. просто продлить при превышении лимита можно)
+		if (!$expected_result->option_limit->isFit($circumstance) && (!$action->alteration->isProlongation() || $action->alteration->isActivation())) {
 			return new \Tariff\Plan\AlterationAvailability(\Tariff\Plan\AlterationAvailability::UNAVAILABLE_UNAPPROPRIATED, static::ERROR_EXCEEDED, "not fit");
 		}
 
@@ -348,6 +349,11 @@ class OptionLimit extends Option {
 		// запрещаем уменьшать число пользователей платежом
 		if ($this->_value > $expected_result->option_limit->_value && $action->hasReason() && !$action->alteration->isActivation()) {
 			return new \Tariff\Plan\AlterationAvailability(\Tariff\Plan\AlterationAvailability::UNAVAILABLE_UNAPPROPRIATED, static::ERROR_UNSUPPORTED_REPLACEMENT, "can not decrease with reason");
+		}
+
+		// если изменяем количество людей, то проверяем, что не можем уменьшить больше, чем есть сейчас пользователей
+		if ($action->alteration->isChange() && !$expected_result->option_limit->isFit($circumstance)) {
+			return new \Tariff\Plan\AlterationAvailability(\Tariff\Plan\AlterationAvailability::UNAVAILABLE_UNAPPROPRIATED, static::ERROR_EXCEEDED, "not fit");
 		}
 
 		// уменьшать всегда позволяем бесплатно,

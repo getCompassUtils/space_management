@@ -264,11 +264,6 @@ abstract class BasePlan extends \Tariff\Plan\BasePlan implements PremiseUserCoun
 			$alteration->availability->arrange(new AlterationAvailability(AlterationAvailability::UNAVAILABLE_UNAPPROPRIATED, static::ERROR_PLAN_UNEXPECTED_EXPIRATION_DATE, "expiration date not equal to expected"));
 		}
 
-		// активация бесплатного тарифа невозможна, нужно использовать change-альтерацию
-		if (isset($alteration->option_limit) && $alteration->option_limit->isFree() && $alteration->isActivation()) {
-			$alteration->availability->arrange(new AlterationAvailability(AlterationAvailability::UNAVAILABLE_UNAPPROPRIATED, 1, "can not activate free"));
-		}
-
 		// проверяем, если текущий тариф истек, то для его продления необходим
 		// флаг действия — «активация», если его нет, то действие невозможно выполнить
 		if (!$alteration->isActivation() && $alteration->isProlongationExtend() && !$this->isActive($action->getTime())) {
